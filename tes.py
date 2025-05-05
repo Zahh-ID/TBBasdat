@@ -1,44 +1,39 @@
-from tkinter import *
-from PIL import Image, ImageTk
+import mysql.connector
+from PIL import Image
+import io
 
-# Membuat window Tkinter
-window = Tk()
-window.title("Gambar dengan Ukuran Sama")
-window.geometry("800x600")  # Ukuran window sesuai kebutuhan
+# Fungsi untuk mengonversi gambar menjadi format biner
+def convert_image_to_binary(image_path):
+    with open(image_path, 'rb') as file:
+        binary_data = file.read()
+    return binary_data
 
-# Ukuran gambar yang diinginkan
-desired_width = 300  # Lebar yang diinginkan
-desired_height = 200  # Tinggi yang diinginkan
+# Fungsi untuk menyimpan gambar ke database
+def save_image_to_db(hotel_id, image_path):
+    conn = mysql.connector.connect(
+        host="localhost",        # Ganti dengan host MySQL kamu
+        user="root",             # Ganti dengan username MySQL kamu
+        password="",             # Ganti dengan password MySQL kamu
+        database="tb"            # Ganti dengan nama database kamu
+    )
 
-# Daftar gambar yang ingin ditampilkan (ganti dengan path gambar Anda)
-image_paths = [
-    "./assets/s.png",  # Ganti dengan path gambar yang sesuai
-    "./assets/screen.png",  # Ganti dengan path gambar yang sesuai
-    "./assets/uiawal2.png",  # Ganti dengan path gambar yang sesuai
-    # Tambahkan gambar lainnya
-]
-
-# Membuat canvas untuk menampilkan gambar
-canvas = Canvas(window, width=800, height=600)
-canvas.pack()
-
-# Menampilkan gambar-gambar dengan ukuran yang sama
-x_position = 0  # Posisi x untuk gambar pertama
-y_position = 0  # Posisi y untuk gambar pertama
-
-for image_path in image_paths:
-    img = Image.open(image_path)  # Membuka gambar
-    img_resized = img.resize((desired_width, desired_height))  # Mengubah ukuran gambar
-    img_tk = ImageTk.PhotoImage(img_resized)  # Mengonversi gambar untuk Tkinter
+    cursor = conn.cursor()
     
-    # Menampilkan gambar pada canvas
-    canvas.create_image(x_position, y_position, anchor=NW, image=img_tk)
+    # Mengonversi gambar ke format biner
+    image_binary = convert_image_to_binary(image_path)
     
-    # Menyimpan gambar agar tidak hilang
-    canvas.image = img_tk  # Menyimpan gambar di dalam canvas untuk mencegah penghapusan
+    # Menyimpan gambar dalam database
+    sql = "UPDATE hotel SET gambar = %s WHERE id_hotel = %s;"
+    cursor.execute(sql, (image_binary,hotel_id))
+    conn.commit()
+    
+    print(f"Image for {hotel_id} saved successfully.")
+    conn.close()
 
-    # Memperbarui posisi untuk gambar berikutnya
-    y_position += desired_height + 10  # Menambah jarak antar gambar (10 piksel)
-
-# Menjalankan aplikasi Tkinter
-window.mainloop()
+# Menyimpan gambar-gambar hotel ke database
+save_image_to_db("Hotel1", "./assets/hotel/hotel1.jpeg")
+save_image_to_db("Hotel2", "./assets/hotel/hotel2.jpeg")
+save_image_to_db("Hotel3", "./assets/hotel/hotel3.jpeg")
+save_image_to_db("Hotel4", "./assets/hotel/hotel4.jpeg")
+save_image_to_db("Hotel5", "./assets/hotel/hotel5.jpeg")
+save_image_to_db("Hotel6", "./assets/hotel/hotel6.jpeg")

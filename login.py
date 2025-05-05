@@ -4,6 +4,7 @@ from confirm import checker  # Assuming this function checks login credentials
 from createaccount import createaccount
 from PIL import Image, ImageTk, ImageFilter
 from signup import signup
+from hotel import getdesc, getname,getalamat,getRating
 
 
 window = Tk()
@@ -13,7 +14,7 @@ appheight = 700
 screenwidth = window.winfo_screenwidth()
 screenheight = window.winfo_screenheight()
 x = (screenwidth/2) - (appwidth/2)
-y = (screenheight/2) - (appheight/2)
+y = 0
 window.geometry(f'{appwidth}x{appheight}+{int(x)}+{int(y)}')
 window.resizable(False, False)
 def eventButton(event):
@@ -43,27 +44,219 @@ def clear_window():
     for widget in window.winfo_children():
         widget.destroy()
 
+def load_hotel_images(image_paths):
+    for idx, path in enumerate(image_paths, start=1):
+        # Membaca dan meresize gambar
+        img = Image.open(path).resize((1080, 700))
+        # Membuat nama variabel secara dinamis dan menyimpan gambar
+        globals()[f"hotel{idx}_img"] = ImageTk.PhotoImage(img)
+
+# Daftar file gambar hotel
+image_paths = [
+    "./assets/hotel/hotel1.jpeg",
+    "./assets/hotel/hotel2.jpeg",
+    "./assets/hotel/hotel3.jpeg",
+    "./assets/hotel/hotel4.jpeg",
+    "./assets/hotel/hotel5.jpeg",
+    "./assets/hotel/hotel6.jpeg"
+]
+
+# Memuat gambar-gambar hotel dan membuat variabel dinamis
+load_hotel_images(image_paths)
+
+kamar1_img = ImageTk.PhotoImage(Image.open("./assets/kamar/hotel1/kamar1.jpeg").resize((1080, 700)))
+kamar2_img = ImageTk.PhotoImage(Image.open("./assets/kamar/hotel1/kamar2.jpeg").resize((1080, 700)))
+kamar3_img = ImageTk.PhotoImage(Image.open("./assets/kamar/hotel1/kamar3.jpeg").resize((1080, 700)))
+kamar4_img = ImageTk.PhotoImage(Image.open("./assets/kamar/hotel1/kamar4.jpeg").resize((1080, 700)))
+kamar5_img = ImageTk.PhotoImage(Image.open("./assets/kamar/hotel1/kamar5.jpeg").resize((1080, 700)))
+kamar6_img = ImageTk.PhotoImage(Image.open("./assets/kamar/hotel1/kamar6.jpeg").resize((1080, 700)))
+def hotel1page():
+    clear_window()
+    canvas = Canvas(window)
+    canvas.pack(side=LEFT, fill=BOTH, expand=True)
+
+    # Create a Scrollbar linked to the Canvas
+    scrollbar = Scrollbar(window, orient=VERTICAL, command=canvas.yview)
+    scrollbar.pack(side=RIGHT, fill=Y)
+
+    canvas.config(yscrollcommand=scrollbar.set)
+
+    # Create a Frame inside the Canvas that will contain all the buttons
+    frame = Frame(canvas)
+    canvas.create_window((0, 0), window=frame, anchor="nw")
+
+    # Configure rows and columns for the frame using grid
+    frame.columnconfigure(0, weight=1)
+    frame.columnconfigure(1, weight=1)
+    frame.columnconfigure(2, weight=1)
+    frame.rowconfigure(0, weight=2)
+    frame.rowconfigure(1, weight=4)
+    frame.rowconfigure(2, weight=3)
+
+    # Add buttons with text and images to the frame using grid
+    Button(frame, text="Back", font=("Arial", 12), fg="#01406c", bg="#FF7B07", compound="top", command=show_mainpage).grid(row=0, column=0, sticky="wesn",columnspan=1)
+    Button(frame, text="Hotel 2", font=("Arial", 12), fg="white", bg="#cc4735", compound="top", command=lambda: print("info")).grid(row=0, column=2, sticky="wesn",columnspan=1)
+    kamar_data = [
+    {"id": "kamar1", "img": kamar1_img},
+    {"id": "kamar2", "img": kamar2_img},
+    {"id": "kamar3", "img": kamar3_img},
+    {"id": "kamar4", "img": kamar4_img},
+    {"id": "kamar5", "img": kamar5_img},
+    {"id": "kamar6", "img": kamar6_img},
+    # Tambahkan hotel lainnya sesuai kebutuhan
+    ]
+
+    # Hotel buttons with images
+    for index, kamar in enumerate(kamar_data, start=1):
+        name = getname(kamar["id"])
+        desc = getdesc(kamar["id"])
+        alamat = getalamat(kamar["id"])
+        rating = getRating(kamar["id"])
+        kamar_img = kamar["img"]
+        
+        # Membuat tombol untuk setiap hotel
+        hotel_button = Button(frame, text=f"{name}\n{desc}\n{alamat}\n{rating}", 
+                            font=("Helvetica Neue", 12, "bold"), fg="white", bg="#01B489", 
+                            image=kamar_img, compound="top", command=lambda h=kamar["id"]: print(f"{h} selected"))
+        hotel_button.grid(row=index, column=0, sticky="wesn", columnspan=3)
+
+    # Update the scrollable region
+    frame.update_idletasks()
+    canvas.config(scrollregion=canvas.bbox("all"))
+
+    # Enable scrolling with mouse wheel
+    def on_mouse_wheel(event):
+        canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+
+    canvas.bind_all("<MouseWheel>", on_mouse_wheel)
+    #Kamar
+    window.title("Main Page")
+
+def hotel2page():
+    clear_window()
+    canvas = Canvas(window)
+    canvas.pack(side=LEFT, fill=BOTH, expand=True)
+
+    # Create a Scrollbar linked to the Canvas
+    scrollbar = Scrollbar(window, orient=VERTICAL, command=canvas.yview)
+    scrollbar.pack(side=RIGHT, fill=Y)
+
+    canvas.config(yscrollcommand=scrollbar.set)
+
+    # Create a Frame inside the Canvas that will contain all the buttons
+    frame = Frame(canvas)
+    canvas.create_window((0, 0), window=frame, anchor="nw")
+
+    # Configure rows and columns for the frame using grid
+    frame.columnconfigure(0, weight=1)
+    frame.columnconfigure(1, weight=1)
+    frame.columnconfigure(2, weight=1)
+    frame.rowconfigure(0, weight=2)
+    frame.rowconfigure(1, weight=4)
+    frame.rowconfigure(2, weight=3)
+
+    # Add buttons with text and images to the frame using grid
+    Button(frame, text="Back", font=("Arial", 12), fg="#01406c", bg="#FF7B07", compound="top", command=show_mainpage).grid(row=0, column=0, sticky="wesn",columnspan=1)
+    Button(frame, text="Hotel 2", font=("Arial", 12), fg="white", bg="#cc4735", compound="top", command=lambda: print("info")).grid(row=0, column=2, sticky="wesn",columnspan=1)
+    kamar_data = [
+    {"id": "kamar1", "img": kamar1_img},
+    {"id": "kamar2", "img": kamar2_img},
+    {"id": "kamar3", "img": kamar3_img},
+    {"id": "kamar4", "img": kamar4_img},
+    {"id": "kamar5", "img": kamar5_img},
+    {"id": "kamar6", "img": kamar6_img},
+    # Tambahkan hotel lainnya sesuai kebutuhan
+    ]
+
+    # Hotel buttons with images
+    for index, kamar in enumerate(kamar_data, start=1):
+        name = getname(kamar["id"])
+        desc = getdesc(kamar["id"])
+        alamat = getalamat(kamar["id"])
+        rating = getRating(kamar["id"])
+        kamar_img = kamar["img"]
+        
+        # Membuat tombol untuk setiap hotel
+        hotel_button = Button(frame, text=f"{name}\n{desc}\n{alamat}\n{rating}", 
+                            font=("Helvetica Neue", 12, "bold"), fg="white", bg="#01B489", 
+                            image=kamar_img, compound="top", command=lambda h=kamar["id"]: print(f"{h} selected"))
+        hotel_button.grid(row=index, column=0, sticky="wesn", columnspan=3)
+
+    # Update the scrollable region
+    frame.update_idletasks()
+    canvas.config(scrollregion=canvas.bbox("all"))
+
+    # Enable scrolling with mouse wheel
+    def on_mouse_wheel(event):
+        canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+
+    canvas.bind_all("<MouseWheel>", on_mouse_wheel)
+    #Kamar
+    window.title("Main Page")
+
+
+
+
 def show_mainpage():
     clear_window()  
-    window.columnconfigure(0, weight=1)
-    window.columnconfigure(1, weight=1)
-    window.columnconfigure(2, weight=1)
-    window.rowconfigure(0, weight=1)
-    window.rowconfigure(1, weight=1)
-    Hotel1 = Button(window, text="Hotel 1", font=("Arial", 12), fg="white", bg="#cc4735", command=lambda: print("Hotel 1 selected"))
-    Hotel1.grid(row=0, column=0,sticky="wesn")
-    Hotel2 = Button(window, text="Hotel 2", font=("Arial", 12), fg="white", bg="#cc4735", command=lambda: print("Hotel 2 selected"))
-    Hotel2.grid(row=0, column=1,sticky="wesn")
-    Hotel3 = Button(window, text="Hotel 3", font=("Arial", 12), fg="white", bg="#cc4735", command=lambda: print("Hotel 3 selected"))
-    Hotel3.grid(row=0, column=2,sticky="wesn")
-    Hotel4 = Button(window, text="Hotel 4", font=("Arial", 12), fg="white", bg="#cc4735", command=lambda: print("Hotel 4 selected"))
-    Hotel4.grid(row=1, column=0,sticky="wesn")
-    Hotel5 = Button(window, text="Hotel 5", font=("Arial", 12), fg="white", bg="#cc4735", command=lambda: print("Hotel 5 selected"))
-    Hotel5.grid(row=1, column=1,sticky="wesn")
-    Hotel6 = Button(window, text="Hotel 6", font=("Arial", 12), fg="white", bg="#cc4735", command=lambda: print("Hotel 6 selected"))
-    Hotel6.grid(row=1, column=2,sticky="wesn")
+    canvas = Canvas(window)
+    canvas.pack(side=LEFT, fill=BOTH, expand=True)
 
-    # Update window title to reflect main page
+    # Create a Scrollbar linked to the Canvas
+    scrollbar = Scrollbar(window, orient=VERTICAL, command=canvas.yview)
+    scrollbar.pack(side=RIGHT, fill=Y)
+
+    canvas.config(yscrollcommand=scrollbar.set)
+
+    # Create a Frame inside the Canvas that will contain all the buttons
+    frame = Frame(canvas)
+    canvas.create_window((0, 0), window=frame, anchor="nw")
+
+    # Configure rows and columns for the frame using grid
+    frame.columnconfigure(0, weight=1)
+    frame.columnconfigure(1, weight=1)
+    frame.columnconfigure(2, weight=1)
+    frame.rowconfigure(0, weight=2)
+    frame.rowconfigure(1, weight=4)
+    frame.rowconfigure(2, weight=3)
+
+    # Add buttons with text and images to the frame using grid
+    Button(frame, text="Back", font=("Arial", 12), fg="#01406c", bg="#FF7B07", compound="top", command=lambda: print("Back")).grid(row=0, column=0, sticky="wesn",columnspan=1)
+    Button(frame, text="Hotel 2", font=("Arial", 12), fg="white", bg="#cc4735", compound="top", command=lambda: print("info")).grid(row=0, column=2, sticky="wesn",columnspan=1)
+    hotel_data = [
+    {"id": "Hotel1", "img": hotel1_img},
+    {"id": "Hotel2", "img": hotel2_img},
+    {"id": "Hotel3", "img": hotel3_img},
+    {"id": "Hotel4", "img": hotel4_img},
+    {"id": "Hotel5", "img": hotel5_img},
+    {"id": "Hotel6", "img": hotel6_img},
+    # Tambahkan hotel lainnya sesuai kebutuhan
+    ]
+
+    # Hotel buttons with images
+    for index, hotel in enumerate(hotel_data, start=1):
+        name = getname(hotel["id"])
+        desc = getdesc(hotel["id"])
+        alamat = getalamat(hotel["id"])
+        rating = getRating(hotel["id"])
+        hotel_img = hotel["img"]
+        command = lambda h=hotel["id"]: hotel_page(h)
+        # Membuat tombol untuk setiap hotel
+        hotel_button = Button(frame, text=f"{name}\n{desc}\n{alamat}\n{rating}", 
+                            font=("Helvetica Neue", 12, "bold"), fg="white", bg="#01B489", 
+                            image=hotel_img, compound="top", command=hotel1page)
+        hotel_button.grid(row=index, column=0, sticky="wesn", columnspan=3)
+
+    # Update the scrollable region
+    frame.update_idletasks()
+    canvas.config(scrollregion=canvas.bbox("all"))
+
+    # Enable scrolling with mouse wheel
+    def on_mouse_wheel(event):
+        canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+
+    canvas.bind_all("<MouseWheel>", on_mouse_wheel)
+    #Kamar
     window.title("Main Page")
     
 def confirm():
