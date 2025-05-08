@@ -12,7 +12,7 @@ def checker(username, password):
     cur = con.cursor()
     
     # Query untuk mencari username dan password yang cocok
-    sql = "SELECT * FROM users WHERE username = %s AND password = %s"
+    sql = "SELECT * FROM user WHERE username = %s AND password = %s"
     data = (username, password)
     
     try:

@@ -1,6 +1,13 @@
 import mysql.connector
 from tkinter import *
 
+conn = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="",
+    database="tb"
+)
+
 def getdesc(id):
     conn = mysql.connector.connect(
         host="localhost",
@@ -39,12 +46,11 @@ def getname(id):
 
 def getalamat(id):
     conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="tb"
-    )
-
+            host="localhost",
+            user="root",
+            password="",
+            database="tb"
+        )
     cursor = conn.cursor()
     sql = "SELECT alamat FROM hotel WHERE id_hotel = %s"
     cursor.execute(sql, (id,))
@@ -70,17 +76,42 @@ def getRating(id):
     if result:
         return result[0]
     return "Deskripsi tidak ditemukan"
+
+def fasilitass(id):
+    conn = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="",
+        database="tb"
+    )
+    cursor = conn.cursor()
+    sql = "CALL GetFasilitasByHotelId(%s)"
+    cursor.execute(sql,(id,))
+    result = cursor.fetchall()
+    conn.close()
+    if result:
+        fasilitas_list = [row[0] for row in result]  # Ambil hanya nama fasilitas dari setiap tuple
+        fasilitas_string = ", ".join(fasilitas_list)
+        return fasilitas_string
+    return "Deskripsi Tidak ditemukan"
     
 
 
+
 class hotel:
-    def __init__(self, id_hotel,nama, alamat, telepon, desc,rating):
+    def __init__(self, id_hotel,nama, alamat, desc,fasilitas,rating):
         self._id_hotel = id_hotel
         self._name = nama
         self._alamat = alamat
-        self._telepon = telepon
         self._desc = desc
+        self._fasilitas =fasilitas
         self._rating = rating
+
+    def getfasilitas(self):
+        return self._fasilitas
+    
+    def getId(self):
+        return self._id_hotel
 
     def getnama(self):
         return self._name
@@ -115,23 +146,18 @@ class hotel:
     def setrating(self, rating):
         self._rating = rating
 
+    def setFasilitas(self,fas):
+        self._fasilitas = fas
+
 def get_hotel_data(id_hotel):
-    # Sambungkan ke database
-    conn = mysql.connector.connect(
-        host="localhost",        # Ganti dengan host MySQL kamu
-        user="root",             # Ganti dengan username MySQL kamu
-        password="",             # Ganti dengan password MySQL kamu
-        database="tb"            # Ganti dengan nama database kamu
-    )
-    
     cursor = conn.cursor()
-    sql = "SELECT * FROM hotel WHERE id_hotel = %s"
+    sql = "SELECT * FROM hotel WHERE Id_Hotel = %s"
     cursor.execute(sql, (id_hotel,))  # Query untuk mengambil data berdasarkan ID
     result = cursor.fetchone()  # Ambil satu hasil
     conn.close()
 
     if result:
-        return hotel(result[0], result[1], result[2], result[3], result[4], result[5])  # Mengembalikan objek Hotel
+        return hotel(result[0], result[1], result[2], result[3], fasilitass(id_hotel), result[4])  # Mengembalikan objek Hotel
     else:
         return None  # Jika tidak ditemukan hotel dengan ID tersebut
 

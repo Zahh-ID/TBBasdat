@@ -1,14 +1,15 @@
 from hotel import hotel
-
+import mysql.connector
 
 class kamar(hotel):
-    def __init__(self, id_hotel, nama, alamat, telepon, desc, rating, id_kamar, tipe, harga, kapasitas,status):
+    def __init__(self, id_hotel, nama, alamat, telepon, desc, rating, id_kamar,Nomor, tipe, kapasitas, harga):
         super().__init__(id_hotel, nama, alamat, telepon, desc, rating)
         self._id_kamar = id_kamar
+        self._Nomor = Nomor
         self._tipe = tipe
-        self._harga = harga
         self._kapasitas = kapasitas
-        self._status = status
+        self._harga = harga
+        
 
     def getid_kamar(self):
         return self._id_kamar
@@ -40,14 +41,59 @@ class kamar(hotel):
     def setstatus_kamar(self, status):
         self._status = status
 
+def getKamardata(id):
+    # Sambungkan ke database
+    conn = mysql.connector.connect(
+        host="localhost",        # Ganti dengan host MySQL kamu
+        user="root",             # Ganti dengan username MySQL kamu
+        password="",             # Ganti dengan password MySQL kamu
+        database="tb"            # Ganti dengan nama database kamu
+    )
+    
+    cursor = conn.cursor()
+    sql = "SELECT * FROM kamar WHERE Id_Kamar = %s"
+    cursor.execute(sql, (id,))  # Query untuk mengambil data berdasarkan ID
+    result = cursor.fetchone()  # Ambil satu hasil
+    conn.close()
+    
+    if result:
+        print(result)
+        return kamar(result[0], result[1], result[2], result[3], result[4], result[5])  # Mengembalikan objek Hotel
+    else:
+        return None
+    
+import mysql.connector
 
-hotel1 = kamar(1, "Hotel A", "Jakarta", "021-123456", "Hotel bintang 5", 4.5, 101, "Deluxe", 1000000, 2, True)
-hotel2 = kamar(2, "Hotel B", "Bandung", "022-654321", "Hotel bintang 4", 4.0, 102, "Superior", 800000, 3, True)   
-hotel3 = kamar(3, "Hotel C", "Bali", "0361-987654", "Hotel bintang 3", 3.5, 103, "Standard", 600000, 2, True)
-hotel4 = kamar(4, "Hotel D", "Yogyakarta", "0274-123456", "Hotel bintang 2", 3.0, 104, "Economy", 400000, 1, True)
+def getIdKamar(tipe, idHotel):
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="",
+            database="tb"
+        )
+        cursor = conn.cursor()
+        sql = "SELECT Id_Kamar FROM kamar WHERE Id_Tipe = %s AND Id_Hotel = %s"
+        cursor.execute(sql, (tipe, idHotel))
+        result = cursor.fetchone()
+        if result:
+            return result[0]
+        else:
+            return None  # Mengembalikan None jika kamar tidak ditemukan
+    except mysql.connector.Error as err:
+        print(f"Error saat mengambil ID Kamar: {err}")
+        return None  # Mengembalikan None jika terjadi error database
+    finally:
+        if cursor:
+            cursor.close()
+        if conn and conn.is_connected():
+            conn.close()
 
-print(hotel1.getnama())
-print(hotel1.gettipe_kamar())
-print(hotel1.getharga_kamar())
-print(hotel1.getkapasitas_kamar()) 
-print(hotel1.getstatus_kamar())
+# Contoh Penggunaan:
+# id_kamar = getIdKamar("Superior", "HTL001")
+# if id_kamar:
+#     print(f"ID Kamar yang ditemukan: {id_kamar}")
+# else:
+#     print("Kamar tidak ditemukan atau terjadi kesalahan.")
